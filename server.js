@@ -13,10 +13,12 @@ app.use(bodyParser.json());
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// 👉 Servir le dossier public
-app.use(express.static(path.join(__dirname, "public")));
+// 👉 Sert ton index.html à la racine
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "index.html"));
+});
 
-// Route test API
+// Test API route
 app.get("/api", (req, res) => {
   res.send("✅ RblxBox API is online!");
 });
