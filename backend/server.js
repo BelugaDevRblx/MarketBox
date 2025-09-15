@@ -8,12 +8,24 @@ dotenv.config();
 const app = express();
 app.use(bodyParser.json());
 
-// simulate database
+// Simple route for testing
+app.get("/", (req, res) => {
+  res.send("✅ RblxBox API is online!");
+});
+
+// Simulated database (in memory for now)
 const users = [];
 
-// REGISTER with Roblox verification
+/**
+ * REGISTER
+ * User must prove ownership of their Roblox account by adding a phrase to their description
+ */
 app.post("/register", async (req, res) => {
   const { username, password, robloxId, phrase } = req.body;
+
+  if (!username || !password || !robloxId || !phrase) {
+    return res.status(400).json({ error: "Missing fields" });
+  }
 
   if (users.find((u) => u.username === username)) {
     return res.status(400).json({ error: "Username already exists" });
@@ -21,12 +33,15 @@ app.post("/register", async (req, res) => {
 
   try {
     const r = await fetch(`https://users.roblox.com/v1/users/${robloxId}`);
+    if (!r.ok) {
+      return res.status(400).json({ error: "Invalid Roblox ID" });
+    }
     const data = await r.json();
 
     if (!data.description || !data.description.includes(phrase)) {
-      return res
-        .status(400)
-        .json({ error: "Verification phrase not found in Roblox description" });
+      return res.status(400).json({
+        error: "Verification phrase not found in Roblox description",
+      });
     }
 
     const role = "User";
@@ -35,14 +50,19 @@ app.post("/register", async (req, res) => {
 
     return res.json({ success: true, user: { username, role } });
   } catch (err) {
+    console.error(err);
     return res.status(500).json({ error: "Roblox API error" });
   }
 });
 
-// LOGIN (Owner check + normal user)
+/**
+ * LOGIN
+ * Owner is checked via .env
+ */
 app.post("/login", (req, res) => {
   const { username, password } = req.body;
 
+  // Owner check
   if (
     username === process.env.OWNER_USER &&
     password === process.env.OWNER_PASS
@@ -50,14 +70,19 @@ app.post("/login", (req, res) => {
     return res.json({ role: "Owner", username });
   }
 
-  const u = users.find((x) => x.username === username && x.password === password);
+  // Normal user check
+  const u = users.find(
+    (x) => x.username === username && x.password === password
+  );
   if (!u) {
     return res.status(400).json({ error: "Invalid credentials" });
   }
+
   res.json({ role: u.role, username: u.username });
 });
 
-// START SERVER
-app.listen(3000, () =>
-  console.log("✅ RblxBox API running on http://localhost:3000")
-);
+// Port for Render
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`✅ RblxBox API running on port ${PORT}`);
+});
