@@ -3,167 +3,174 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>RblxBox — Roblox Game Marketplace</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <title>RblxBox — Roblox Games Market</title>
   <style>
-    :root{
-      --bg:#0f111a;
-      --card:#151822;
-      --accent:#ff4ecd;
-      --accent2:#00f5d4;
-      --muted:#94a3b8;
-      --text:#e6eef8;
-      --border:rgba(255,255,255,0.08);
+    :root {
+      --bg: #0f111a;
+      --card: #151822;
+      --accent: #8b5cf6;
+      --accent2: #00f5d4;
+      --muted: #94a3b8;
+      --text: #e6eef8;
+      --border: rgba(255, 255, 255, 0.08);
     }
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:Poppins,system-ui,Arial,sans-serif;background:radial-gradient(circle at top,var(--bg) 0%,#06070c 100%);color:var(--text);line-height:1.5;overflow-x:hidden}
-    a{text-decoration:none;color:inherit}
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
 
-    header{position:sticky;top:0;z-index:12;background:rgba(15,17,26,0.85);backdrop-filter:blur(12px);display:flex;justify-content:space-between;align-items:center;padding:12px 32px;border-bottom:1px solid var(--border)}
-    header h1{font-size:18px;font-weight:800;color:var(--accent)}
-    .controls{display:flex;gap:12px;align-items:center}
+    /* Header */
+    header { display: flex; justify-content: space-between; align-items: center; padding: 16px 32px; background: var(--card); border-bottom: 1px solid var(--border); }
+    header h1 { font-size: 22px; font-weight: 800; color: var(--accent); }
+    .btn { padding: 10px 16px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; transition: 0.2s; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-primary:hover { background: #7c3aed; }
+    .btn-secondary { background: #1f2937; color: var(--muted); }
 
-    .hero{min-height:30vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;}
-    .hero h2{font-size:36px;font-weight:800;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;color:transparent;margin-bottom:12px}
-    .hero p{max-width:760px;color:var(--muted);font-size:16px;margin-bottom:20px}
+    /* Hero */
+    .hero { text-align: center; padding: 60px 20px; }
+    .hero h2 { font-size: 32px; font-weight: 800; color: var(--accent2); margin-bottom: 12px; }
+    .hero p { color: var(--muted); max-width: 700px; margin: auto; }
 
-    section{padding:40px 20px;max-width:1200px;margin:auto}
-    section h3{text-align:left;font-size:24px;margin-bottom:18px;color:var(--accent)}
+    /* Shop */
+    section { padding: 20px; max-width: 1200px; margin: auto; }
+    .shop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+    .item { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; transition: 0.25s; }
+    .item:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+    .item img { width: 100%; height: 160px; object-fit: cover; }
+    .item-body { padding: 12px; }
+    .meta { display: flex; justify-content: space-between; margin-top: 6px; font-size: 14px; }
+    .price { font-weight: 800; color: var(--accent2); }
+    .seller { color: var(--muted); }
+    .buy-row { display: flex; gap: 8px; margin-top: 12px; }
+    .buy-btn, .more-btn { flex: 1; padding: 8px; border-radius: 6px; text-align: center; font-weight: 600; cursor: pointer; }
+    .buy-btn { background: var(--accent); color: #fff; }
+    .more-btn { border: 1px solid var(--border); color: var(--muted); }
 
-    .shop-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:20px}
-    .item{background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent);border-radius:12px;overflow:hidden;transition:.28s;cursor:pointer;border:1px solid var(--border);display:flex;flex-direction:column}
-    .item:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(0,245,212,0.08)}
-    .item img{width:100%;height:160px;object-fit:cover}
-    .item-body{padding:12px;flex:1;display:flex;flex-direction:column}
-    .item-body h4{margin:0;font-size:16px}
-    .meta{display:flex;justify-content:space-between;align-items:center;margin-top:10px}
-    .price{color:var(--accent2);font-weight:800}
-    .seller{font-size:13px;color:var(--muted)}
-    .buy-row{display:flex;gap:8px;margin-top:12px}
-    .buy-btn{flex:1;padding:8px;border-radius:8px;text-align:center;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#fff;font-weight:700}
-    .more-btn{padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);font-weight:700}
+    /* Modal */
+    .modal { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.7); visibility: hidden; opacity: 0; transition: 0.3s; z-index: 50; }
+    .modal.open { visibility: visible; opacity: 1; }
+    .modal-box { background: var(--card); padding: 20px; border-radius: 12px; width: 90%; max-width: 400px; }
+    .modal-box h2 { margin-bottom: 16px; }
+    .field { margin-bottom: 12px; }
+    .field input, .field textarea, .field select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); background: #0f111a; color: #fff; }
 
-    .modal{position:fixed;inset:0;background:rgba(2,6,23,0.6);display:flex;align-items:center;justify-content:center;z-index:50;opacity:0;pointer-events:none;transition:.18s}
-    .modal.open{opacity:1;pointer-events:all}
-    .form{background:var(--card);padding:20px;border-radius:12px;width:96%;max-width:640px;border:1px solid var(--border)}
-    .form h4{margin-bottom:12px}
-    .field{display:flex;flex-direction:column;margin-bottom:10px}
-    .field label{font-size:13px;color:var(--muted);margin-bottom:6px}
-    .field input,.field select,.field textarea{background:transparent;border:1px solid var(--border);padding:10px;border-radius:8px;color:var(--text);outline:none}
-    .actions{display:flex;gap:10px;justify-content:flex-end;margin-top:10px}
+    /* Chat */
+    .chat { position: fixed; right: 0; top: 0; bottom: 0; width: 320px; background: var(--card); display: flex; flex-direction: column; border-left: 1px solid var(--border); }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 12px; }
+    .msg { margin-bottom: 12px; padding: 8px; border-radius: 8px; background: #1f2937; font-size: 14px; }
+    .msg span { color: var(--accent); font-weight: bold; margin-right: 6px; }
+    .tag { font-size: 11px; padding: 2px 6px; border-radius: 6px; margin-left: 6px; }
+    .tag-owner { background: var(--accent2); color: #000; }
+    .tag-seller { background: var(--accent); color: #fff; }
+    .chat-input { display: flex; border-top: 1px solid var(--border); }
+    .chat-input input { flex: 1; padding: 10px; border: none; background: #0f111a; color: #fff; }
+    .chat-input button { padding: 10px; background: var(--accent); color: #fff; border: none; cursor: pointer; }
 
-    #chatBox{position:fixed;right:0;top:60px;bottom:0;width:300px;background:var(--card);border-left:1px solid var(--border);display:flex;flex-direction:column;}
-    #chatMessages{flex:1;overflow-y:auto;padding:10px}
-
-    footer{text-align:center;padding:20px;color:var(--muted);font-size:14px;margin-top:40px}
   </style>
 </head>
 <body>
   <header>
-    <h1>RblxBox — Roblox Game Marketplace</h1>
-    <div class="controls" id="controls"></div>
+    <h1>RblxBox</h1>
+    <button id="btnLogin" class="btn-primary">LOGIN</button>
+    <button id="btnNewItem" class="btn-secondary hidden">New Item</button>
   </header>
 
   <div class="hero">
-    <h2>Welcome to RblxBox</h2>
-    <p>Discover items, filter by game, and create your own listing. Sellers must verify their Roblox account before posting.</p>
+    <h2>Community Roblox Market</h2>
+    <p>Buy and sell items easily. Verify your Roblox account to start selling!</p>
   </div>
 
-  <section id="shop">
+  <section>
     <h3>Available Items</h3>
     <div id="itemsWrap" class="shop-grid"></div>
-    <div id="emptyMsg" class="empty" style="display:none">No items found.</div>
   </section>
 
-  <!-- Community Chat -->
-  <div id="chatBox">
-    <div id="chatMessages"></div>
-    <div style="padding:10px;border-top:1px solid var(--border);display:flex;gap:5px">
-      <input id="chatInput" placeholder="Write a message..." style="flex:1;padding:6px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text)">
-      <button class="create-btn" onclick="sendChat()">➤</button>
+  <!-- Item Creation Modal -->
+  <div class="modal" id="itemModal">
+    <div class="modal-box">
+      <h2>Create Item</h2>
+      <div class="field"><input id="f_title" placeholder="Item title"></div>
+      <div class="field"><input id="f_img" placeholder="Image URL"></div>
+      <div class="field"><input id="f_price" type="number" placeholder="Price (Robux)"></div>
+      <div class="field"><textarea id="f_desc" rows="3" placeholder="Description"></textarea></div>
+      <button class="btn-primary" onclick="postItem()">Publish</button>
+      <button class="btn-secondary" onclick="closeItemModal()">Cancel</button>
     </div>
   </div>
 
-  <footer>© 2025 — RblxBox Marketplace</footer>
+  <!-- Login Modal -->
+  <div class="modal" id="loginModal">
+    <div class="modal-box">
+      <h2>Login with Roblox</h2>
+      <div class="field"><input id="username" placeholder="Roblox Username"></div>
+      <button class="btn-primary" onclick="requestCode()">Request Code</button>
+      <p id="codeMsg"></p>
+      <button id="verifyBtn" class="btn-primary hidden" onclick="verifyCode()">Verify</button>
+    </div>
+  </div>
 
-<script>
-/* ======================
-   RblxBox Frontend Logic
-   ====================== */
+  <!-- Chat -->
+  <div class="chat">
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input">
+      <input id="chatInput" placeholder="Type a message...">
+      <button onclick="sendChat()">Send</button>
+    </div>
+  </div>
 
-async function register(){
-  const username=prompt("Choose a username:");
-  const password=prompt("Choose a password:");
-  const robloxId=prompt("Enter your Roblox ID:");
-  const phrase="verify-"+Math.random().toString(36).slice(2,8);
+  <script>
+    let currentUser=null;
+    const loginModal=document.getElementById("loginModal");
+    const codeMsg=document.getElementById("codeMsg");
+    const verifyBtn=document.getElementById("verifyBtn");
+    const itemModal=document.getElementById("itemModal");
+    const itemsWrap=document.getElementById("itemsWrap");
 
-  alert("To verify your account, please put this phrase in your Roblox description:\n\n"+phrase);
+    document.getElementById("btnLogin").addEventListener("click",()=>loginModal.classList.add("open"));
+    function closeLogin(){loginModal.classList.remove("open")}
+    function closeItemModal(){itemModal.classList.remove("open")}
 
-  const res=await fetch("http://localhost:3000/register",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({username,password,robloxId,phrase})
-  });
-  const data=await res.json();
-  if(data.error){alert(data.error);} else {alert("Account created! You can login now.");}
-}
+    async function requestCode(){
+      const username=document.getElementById("username").value.trim();
+      if(!username) return alert("Enter your Roblox username");
+      const res=await fetch("/api/request-code",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username})});
+      const data=await res.json();
+      if(data.role==="Owner"){currentUser={username,role:"Owner"};closeLogin();afterLogin();return}
+      if(data.code){codeMsg.innerText="Put this code in your Roblox description: "+data.code;verifyBtn.classList.remove("hidden")}
+    }
 
-async function login(){
-  const username=prompt("Username:");
-  const password=prompt("Password:");
+    async function verifyCode(){
+      const username=document.getElementById("username").value.trim();
+      const res=await fetch("/api/verify-code",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({username})});
+      const data=await res.json();
+      if(data.success){currentUser=data;closeLogin();afterLogin();} else alert(data.error||"Verification failed");
+    }
 
-  const res=await fetch("http://localhost:3000/login",{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({username,password})
-  });
-  const data=await res.json();
-  if(data.error){alert(data.error);} else {
-    alert("Welcome "+data.username+" ("+data.role+")");
-    sessionStorage.setItem("user",JSON.stringify(data));
-    renderControls();
-  }
-}
+    function afterLogin(){
+      document.getElementById("btnLogin").classList.add("hidden");
+      if(currentUser.role==="Owner"||currentUser.role==="Seller"){document.getElementById("btnNewItem").classList.remove("hidden");document.getElementById("btnNewItem").onclick=()=>itemModal.classList.add("open")}
+      alert("Welcome "+currentUser.username+" ("+currentUser.role+")");
+    }
 
-function logout(){
-  sessionStorage.removeItem("user");
-  renderControls();
-}
+    function postItem(){
+      const title=document.getElementById("f_title").value;
+      const img=document.getElementById("f_img").value||"https://via.placeholder.com/400x240/777/fff?text="+title;
+      const price=document.getElementById("f_price").value;
+      const desc=document.getElementById("f_desc").value;
+      if(!title)return alert("Title required");
+      const card=document.createElement("div");card.className="item";
+      card.innerHTML=`<img src="${img}"><div class="item-body"><h4>${title}</h4><div class="meta"><div class="seller">@${currentUser.username}</div><div class="price">${price} Robux</div></div><p>${desc}</p><div class="buy-row"><div class="buy-btn">Buy</div><div class="more-btn">Details</div></div></div>`;
+      itemsWrap.prepend(card);
+      closeItemModal();
+    }
 
-function renderControls(){
-  const user=JSON.parse(sessionStorage.getItem("user")||"null");
-  const controls=document.getElementById("controls");
-  if(!user){
-    controls.innerHTML=`
-      <button class="create-btn" onclick="login()">Login</button>
-      <button class="more-btn" onclick="register()">Register</button>
-    `;
-  }else{
-    controls.innerHTML=`
-      <span style="color:var(--accent2);font-weight:700">@${user.username}${user.role==="Owner"?" 👑":user.role==="Seller"?" 🛒":""}</span>
-      <button class="more-btn" onclick="logout()">Logout</button>
-    `;
-  }
-}
-
-/* Chat */
-function sendChat(){
-  const inp=document.getElementById("chatInput");
-  const txt=inp.value.trim();
-  if(!txt)return;
-  const user=JSON.parse(sessionStorage.getItem("user")||"null");
-  if(!user){alert("Login to chat!");return;}
-  const list=document.getElementById("chatMessages");
-  const el=document.createElement("div");
-  el.style="margin-bottom:8px;padding:6px;border-radius:8px;background:rgba(255,255,255,0.02)";
-  el.innerHTML=`<span style="color:var(--accent2);font-weight:600">@${user.username}</span> ${user.role==="Owner"?"👑":user.role==="Seller"?"🛒":""}<br><span>${txt}</span>`;
-  list.appendChild(el);
-  inp.value="";
-  list.scrollTop=list.scrollHeight;
-}
-
-/* Init */
-renderControls();
-</script>
+    function sendChat(){
+      const input=document.getElementById("chatInput");const msg=input.value.trim();if(!msg)return;
+      const box=document.getElementById("chatMessages");
+      const div=document.createElement("div");div.className="msg";
+      let tag="";if(currentUser){if(currentUser.role==="Owner")tag='<span class="tag tag-owner">Owner</span>';if(currentUser.role==="Seller")tag='<span class="tag tag-seller">Seller</span>'}
+      div.innerHTML=`<span>${currentUser?currentUser.username:"Guest"}</span>${tag}: ${msg}`;
+      box.appendChild(div);input.value="";box.scrollTop=box.scrollHeight;
+    }
+  </script>
 </body>
 </html>

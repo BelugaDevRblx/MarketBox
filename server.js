@@ -9,57 +9,65 @@ dotenv.config();
 const app = express();
 app.use(bodyParser.json());
 
-// Fix __dirname in ES modules
+// Fix __dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// 👉 Sert ton index.html à la racine
+// Servir index.html
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "index.html"));
 });
 
-// Test API route
-app.get("/api", (req, res) => {
-  res.send("✅ RblxBox API is online!");
+// Memory DB (codes temporaires)
+const sessions = {};
+
+// Génération du code
+app.post("/api/request-code", (req, res) => {
+  const { username } = req.body;
+  if (!username) return res.status(400).json({ error: "Missing username" });
+
+  // Owner direct
+  if (username === process.env.OWNER_USER) {
+    return res.json({ success: true, role: "Owner", username });
+  }
+
+  const code = "RBX-" + Math.random().toString(36).substring(2, 8).toUpperCase();
+  sessions[username] = code;
+  res.json({ success: true, code });
 });
 
-// Fake DB
-const users = [];
-
-// Register
-app.post("/api/register", async (req, res) => {
-  const { username, password, robloxId, phrase } = req.body;
-
-  if (users.find((u) => u.username === username)) {
-    return res.status(400).json({ error: "Username already exists" });
-  }
+// Vérification du code
+app.post("/api/verify-code", async (req, res) => {
+  const { username } = req.body;
+  const code = sessions[username];
+  if (!code) return res.status(400).json({ error: "No code requested" });
 
   try {
-    const r = await fetch(`https://users.roblox.com/v1/users/${robloxId}`);
-    const data = await r.json();
-    if (!data.description || !data.description.includes(phrase)) {
-      return res.status(400).json({ error: "Verification phrase not found in Roblox description" });
+    // Get Roblox user data
+    const resp = await fetch(`https://users.roblox.com/v1/usernames/users`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ usernames: [username] }),
+    });
+    const data = await resp.json();
+    if (!data.data || data.data.length === 0) {
+      return res.status(400).json({ error: "Roblox user not found" });
     }
 
-    const newUser = { username, password, role: "User", robloxId };
-    users.push(newUser);
-    res.json({ success: true, user: newUser });
+    const userId = data.data[0].id;
+    const resp2 = await fetch(`https://users.roblox.com/v1/users/${userId}`);
+    const profile = await resp2.json();
+
+    if (profile.description && profile.description.includes(code)) {
+      delete sessions[username];
+      return res.json({ success: true, role: "User", username });
+    } else {
+      return res.status(400).json({ error: "Code not found in description" });
+    }
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: "Roblox API error" });
   }
-});
-
-// Login
-app.post("/api/login", (req, res) => {
-  const { username, password } = req.body;
-
-  if (username === process.env.OWNER_USER && password === process.env.OWNER_PASS) {
-    return res.json({ role: "Owner", username });
-  }
-
-  const u = users.find(x => x.username === username && x.password === password);
-  if (!u) return res.status(400).json({ error: "Invalid credentials" });
-  res.json({ role: u.role, username: u.username });
 });
 
 // Start
